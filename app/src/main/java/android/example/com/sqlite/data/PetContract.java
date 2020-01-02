@@ -27,7 +27,13 @@ public final class PetContract {
     private PetContract() {};
 
     /* Inner class that defines the table contents of the location table */
-    public static final class PetsEntry implements BaseColumns {
+    public static final class PetEntry implements BaseColumns {
+        public static final Uri CONTENT_URI = BASE_CONTEST_URI.buildUpon().appendPath(PATH_PETS).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PETS;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PETS;
 
         // Table name
         public static final String TABLE_NAME = "pets";
