@@ -1,15 +1,16 @@
 package android.example.com.sqlite;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.example.com.sqlite.data.PetContract.PetEntry;
+import android.example.com.sqlite.data.PetDBHelper;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
 
@@ -19,16 +20,24 @@ import androidx.core.app.NavUtils;
  */
 public class EditorActivity extends AppCompatActivity {
 
-    /** EditText field to enter the pet's name */
+    /**
+     * EditText field to enter the pet's name
+     */
     private EditText mNameEditText;
 
-    /** EditText field to enter the pet's breed */
+    /**
+     * EditText field to enter the pet's breed
+     */
     private EditText mBreedEditText;
 
-    /** EditText field to enter the pet's weight */
+    /**
+     * EditText field to enter the pet's weight
+     */
     private EditText mWeightEditText;
 
-    /** EditText field to enter the pet's gender */
+    /**
+     * EditText field to enter the pet's gender
+     */
     private Spinner mGenderSpinner;
 
     /**
@@ -90,6 +99,55 @@ public class EditorActivity extends AppCompatActivity {
         });
     }
 
+    public int parseStringToInt(String str) {
+        int option = 0;
+        try {
+            option = Integer.parseInt(mGenderSpinner.getSelectedItem().toString());
+        } catch (NumberFormatException error) {
+            Log.e(EditorActivity.class.getName(), "Could not parse " + error);
+        }
+        return option;
+    }
+
+    /**
+     * Get user input from editor and add new pet into database
+     */
+    private void insertPet() {
+        // Read from input fields
+        // Use trim to eliminate loading or trailing white space
+        String nameString = mNameEditText.getText().toString().trim();
+        String breedString = mBreedEditText.getText().toString().trim();
+        String weightString = mWeightEditText.getText().toString().trim();
+        mGender = parseStringToInt(mGenderSpinner.getSelectedItem().toString());
+
+        // To access our database, we instantiate our subclass of SQLiteOpenHelper
+        // and pass the context, which is the current activity.
+        PetDBHelper mDbHelper = new PetDBHelper(this);
+
+        // Gets the database in write mode
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // Create a ContentValue object where column name are the keys,
+        // and pet's attributes are the values.
+        ContentValues values = new ContentValues();
+        values.put(PetEntry.COLUMN_PET_NAME, nameString);
+        values.put(PetEntry.COLUMN_PET_BREED, breedString);
+        values.put(PetEntry.COLUMN_PET_GENDER, weightString);
+        values.put(PetEntry.COLUMN_PET_WEIGHT, mGender);
+
+        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
+
+        String toastMessage = "";
+        if (newRowId == -1) {
+            toastMessage = "Error with saving pet";
+        } else {
+            toastMessage = "The pet saved with row id: " + newRowId;
+        }
+
+        Toast toast = Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu options from the res/menu/menu_editor.xml file.
@@ -104,7 +162,10 @@ public class EditorActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Do nothing for now
+                // Save pet to database
+                insertPet();
+                // Exit activity
+                finish();
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:

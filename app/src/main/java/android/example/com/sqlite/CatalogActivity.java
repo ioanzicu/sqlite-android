@@ -37,6 +37,13 @@ public class CatalogActivity extends AppCompatActivity {
         displayDatabaseInfo();
     }
 
+    /** Called when the user comes back from the overflow menu */
+    protected void onStart() {
+        super.onStart();
+        // Display refreshed list of row
+        displayDatabaseInfo();
+    }
+
     /**
      * Temporary helper method to display information in the onscreen TextView about the state of
      * the pets database.
