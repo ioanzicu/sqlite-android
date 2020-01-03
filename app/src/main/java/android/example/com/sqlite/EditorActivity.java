@@ -132,8 +132,8 @@ public class EditorActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
         values.put(PetEntry.COLUMN_PET_NAME, nameString);
         values.put(PetEntry.COLUMN_PET_BREED, breedString);
-        values.put(PetEntry.COLUMN_PET_GENDER, weightString);
-        values.put(PetEntry.COLUMN_PET_WEIGHT, mGender);
+        values.put(PetEntry.COLUMN_PET_GENDER, mGender);
+        values.put(PetEntry.COLUMN_PET_WEIGHT, weightString);
 
         long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
 
