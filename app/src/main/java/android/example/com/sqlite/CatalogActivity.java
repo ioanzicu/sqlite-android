@@ -3,10 +3,7 @@ package android.example.com.sqlite;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.example.com.sqlite.data.PetContract;
 import android.example.com.sqlite.data.PetContract.PetEntry;
-import android.example.com.sqlite.data.PetDBHelper;
 import android.net.Uri;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -121,6 +118,9 @@ public class CatalogActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Insert dummy data
+     */
     private void insertPet() {
         // Create a ContentValues object where column names are the keys,
         // and Barni's pet attributes are the values.
