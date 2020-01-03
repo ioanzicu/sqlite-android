@@ -34,7 +34,15 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
-        displayDatabaseInfo();
+        // Find the ListView which will be populated with the pet data
+        ListView petListView = findViewById(R.id.list);
+
+        // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
+        View emptyView = findViewById(R.id.empty_view);
+        petListView.setEmptyView(emptyView);
+
+//        setEmptyView();
+//        displayDatabaseInfo();
     }
 
     /**
@@ -121,5 +129,14 @@ public class CatalogActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setEmptyView() {
+        // Find the ListView which will be populated with the pet data
+        ListView petListView = findViewById(R.id.list);
+
+        // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
+        View emptyView = findViewById(R.id.empty_view);
+        petListView.setEmptyView(emptyView);
     }
 }
