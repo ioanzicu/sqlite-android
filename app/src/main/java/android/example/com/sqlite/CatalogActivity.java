@@ -1,7 +1,10 @@
 package android.example.com.sqlite;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.example.com.sqlite.data.PetContract.PetEntry;
 import android.net.Uri;
@@ -9,7 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -17,7 +21,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 /**
  * Displays list of pets that were entered and stored in the app.
  */
-public class CatalogActivity extends AppCompatActivity {
+public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    // The loader's unique id. Loader ids are specific to the Activity or
+    // Fragment in which they reside.
+    private static final int PET_LOADER_ID = 0;
+
+    // The adapter that binds our data to the ListView
+    private PetCursorAdapter mCursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,50 +52,12 @@ public class CatalogActivity extends AppCompatActivity {
         View emptyView = findViewById(R.id.empty_view);
         petListView.setEmptyView(emptyView);
 
-//        setEmptyView();
-//        displayDatabaseInfo();
-    }
 
-    /**
-     * Called when the user comes back from the overflow menu
-     */
-    protected void onStart() {
-        super.onStart();
-        // Display refreshed list of row
-        displayDatabaseInfo();
-    }
+        mCursorAdapter = new PetCursorAdapter(this, null);
+        petListView.setAdapter(mCursorAdapter);
 
-    /**
-     * Temporary helper method to display information in the onscreen TextView about the state of
-     * the pets database.
-     */
-    private void displayDatabaseInfo() {
-        // Define a projection that specifies which columns from the database
-        // will be used
-        String[] projection = {
-                PetEntry.COLUMN_ID,
-                PetEntry.COLUMN_PET_NAME,
-                PetEntry.COLUMN_PET_BREED,
-                PetEntry.COLUMN_PET_GENDER,
-                PetEntry.COLUMN_PET_WEIGHT
-        };
-
-        Cursor cursor = getContentResolver().query(
-                PetEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null,
-                null);
-
-        // Find the ListView which will be populated with the pet data
-        ListView petListView = findViewById(R.id.list);
-
-        // Setup an Adapter to create a list item for each row of pet data in the Cursor.
-        PetCursorAdapter adapter = new PetCursorAdapter(this, cursor);
-
-        // Attach the adapter to the ListView.
-        petListView.setAdapter(adapter);
+        // initialise the loader
+        getLoaderManager().initLoader(PET_LOADER_ID, null, this);
     }
 
     @Override
@@ -121,7 +94,6 @@ public class CatalogActivity extends AppCompatActivity {
             // Respond to a click on the "Insert dummy data" menu option
             case R.id.action_insert_dummy_data:
                 insertPet();
-                displayDatabaseInfo();
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
@@ -138,5 +110,45 @@ public class CatalogActivity extends AppCompatActivity {
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
         View emptyView = findViewById(R.id.empty_view);
         petListView.setEmptyView(emptyView);
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        // Define a projection that specifies which columns from the database
+        // will be used
+        String[] projection = {
+                PetEntry.COLUMN_ID,
+                PetEntry.COLUMN_PET_NAME,
+                PetEntry.COLUMN_PET_BREED
+        };
+
+        // This loader will execute the ContentProvider's query method on a background thread
+        return new CursorLoader(
+                CatalogActivity.this,
+                PetEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case PET_LOADER_ID:
+                // The asynchronous load is complete and the data
+                // is now available for use. Only now can we associate
+                // the queried Cursor with the PetCursorAdapter.
+                mCursorAdapter.swapCursor(data);
+                break;
+        }
+        // The ListView now displays the queried data.
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        // Callback called when the data needs to be deleted
+        mCursorAdapter.swapCursor(null);
     }
 }
