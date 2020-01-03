@@ -20,7 +20,7 @@
         </activity>
         <provider
                 android:name=".data.PetProvider"
-                android:authorities="android.example.com.sqlite.data"
+                android:authorities="android.example.com.sqlite"
                 android:exported="false"/>
     </application>
 
