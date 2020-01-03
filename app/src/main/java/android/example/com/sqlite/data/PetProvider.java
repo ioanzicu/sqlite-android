@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.example.com.sqlite.data.PetContract;
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -123,6 +124,24 @@ public class PetProvider extends ContentProvider {
      * for that specific row in the database.
      */
     private Uri insertPet(Uri uri, ContentValues values) {
+        // Check that the name is not null
+        String name = values.getAsString(PetContract.PetEntry.COLUMN_PET_NAME);
+        if (name == null || TextUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("Pet requires a name");
+        }
+
+        // If the weight is provided, check that it's greater than or equal to 0 kg
+        Integer weight = values.getAsInteger(PetContract.PetEntry.COLUMN_PET_WEIGHT);
+        if (weight != null && weight < 0) {
+            Log.i("INT", "" + weight);
+            throw new IllegalArgumentException("Pet requires valid weight");
+        }
+
+        Integer gender = values.getAsInteger(PetContract.PetEntry.COLUMN_PET_GENDER);
+        if (gender == null || !PetContract.PetEntry.isValidGender(gender)) {
+            throw new IllegalArgumentException("Pet requires valid gender");
+        }
+
         // Get database connection in write mode
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
@@ -135,8 +154,7 @@ public class PetProvider extends ContentProvider {
             return null;
         }
 
-        // Once we know the ID of the new row in the table,
-        // return the new URI with the ID appended to the end of it
+        // Return the new URI with the ID appended to the end of it
         return ContentUris.withAppendedId(uri, id);
     }
 

@@ -1,13 +1,10 @@
 package android.example.com.sqlite;
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 import android.example.com.sqlite.data.PetContract.PetEntry;
-import android.example.com.sqlite.data.PetDBHelper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -100,16 +97,6 @@ public class EditorActivity extends AppCompatActivity {
         });
     }
 
-    public int parseStringToInt(String str) {
-        int option = 0;
-        try {
-            option = Integer.parseInt(mGenderSpinner.getSelectedItem().toString());
-        } catch (NumberFormatException error) {
-            Log.e(EditorActivity.class.getName(), "Could not parse " + error);
-        }
-        return option;
-    }
-
     /**
      * Get user input from editor and add new pet into database
      */
@@ -119,8 +106,7 @@ public class EditorActivity extends AppCompatActivity {
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
         String weightString = mWeightEditText.getText().toString().trim();
-        int weight = parseStringToInt(weightString);
-        mGender = parseStringToInt(mGenderSpinner.getSelectedItem().toString());
+        int weight = Integer.parseInt(weightString);
 
         // Create a ContentValue object where column name are the keys,
         // and pet's attributes from the editor are the values.
