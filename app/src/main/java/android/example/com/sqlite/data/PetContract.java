@@ -13,22 +13,29 @@ public final class PetContract {
     // relationship between a domain name and its website. A convenient string to use for the
     // content authority is the package name for the app, which is guaranteed to be unique on the
     // device.
-    private static final String CONTENT_AUTHORITY = "android.example.com.sqlite";
+    public static final String CONTENT_AUTHORITY = "android.example.com.sqlite";
 
     // Use CONTENT_AUTHORITY to create the base of all URI's which apps will use to contact
     // the content provider.
-    public static final Uri BASE_CONTEST_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
 
     // Possible paths (appended to base content URI for possible URI's)
     // For instance, content://android.example.com.sqlite/pets"
     public static final String PATH_PETS = "pets";
 
-    private PetContract() {};
+    private PetContract() {
+    }
 
-    /* Inner class that defines the table contents of the location table */
+    /**
+     * Inner class that defines constant values for the pets database table.
+     * Each entry in the table represents a single pet.
+     */
     public static final class PetEntry implements BaseColumns {
-        public static final Uri CONTENT_URI = BASE_CONTEST_URI.buildUpon().appendPath(PATH_PETS).build();
+        /**
+         * The content URI to access the pet data in the provider
+         */
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PETS);
 
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PETS;
