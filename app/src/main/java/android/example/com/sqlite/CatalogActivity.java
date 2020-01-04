@@ -5,6 +5,7 @@ import android.content.*;
 import android.database.Cursor;
 import android.example.com.sqlite.data.PetContract.PetEntry;
 import android.net.Uri;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -79,7 +80,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         });
 
         // Initialise the loader
-        getLoaderManager().initLoader(PET_LOADER_ID, null, this);
+        getLoaderManager().initLoader(PET_LOADER_ID, null, CatalogActivity.this);
     }
 
     @Override
@@ -109,6 +110,14 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
     }
 
+    /**
+     * Helper method to delete all pets in the database.
+     */
+    private void deleteAllPets() {
+        int rowsDeleted = getContentResolver().delete(PetEntry.CONTENT_URI, null, null);
+        Log.v("CatalogActivity", rowsDeleted + " rows deleted from pet database");
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
@@ -119,7 +128,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
-                // Do nothing for now
+                deleteAllPets();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -147,7 +156,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(
-                CatalogActivity.this,
+                this,
                 PetEntry.CONTENT_URI,
                 projection,
                 null,
@@ -157,15 +166,8 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-            case PET_LOADER_ID:
-                // The asynchronous load is complete and the data
-                // is now available for use. Only now can we associate
-                // the queried Cursor with the PetCursorAdapter.
-                mCursorAdapter.swapCursor(data);
-                break;
-        }
-        // The ListView now displays the queried data.
+        // Update {@link PetCursorAdapter} with this new cursor containing updated pet data
+        mCursorAdapter.swapCursor(data);
     }
 
     @Override
